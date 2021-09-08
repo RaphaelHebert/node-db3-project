@@ -24,9 +24,9 @@ const router = express.Router()
   ]
  */
 router.get('/', (req, res, next) => {
-  Schemes.find()
-    .then(schemes => {
-      res.json(schemes)
+    Schemes.find()
+    .then(schemesList => {
+      res.json(schemesList)
     })
     .catch(next)
 })
@@ -53,9 +53,8 @@ router.get('/', (req, res, next) => {
   }
 */
 router.get('/:scheme_id', checkSchemeId, (req, res, next) => {
-  const { scheme_id } = req.params
 
-  Schemes.findById(scheme_id)
+  Schemes.findById(req.params.scheme_id)
     .then(scheme => {
       res.json(scheme)
     })
@@ -82,9 +81,8 @@ router.get('/:scheme_id', checkSchemeId, (req, res, next) => {
   ]
 */
 router.get('/:scheme_id/steps', checkSchemeId, (req, res, next) => {
-  const { scheme_id } = req.params
-
-  Schemes.findSteps(scheme_id)
+  const id = req.params.scheme_id 
+  Schemes.findSteps(id)
     .then(steps => {
       res.json(steps)
     })
@@ -100,14 +98,14 @@ router.get('/:scheme_id/steps', checkSchemeId, (req, res, next) => {
     "scheme_name": "Take Ovah"
   }
 */
-router.post('/', validateScheme, (req, res, next) => {
+router.post('/', validateScheme, async (req, res, next) => {
   const scheme = req.body
-
-  Schemes.add(scheme)
-    .then(scheme => {
-      res.status(201).json(scheme)
-    })
-    .catch(next)
+  try{
+    const result = await Schemes.add(scheme)
+    res.status(201).json(result)
+  } catch (err) {
+    next(err)
+  }  
 })
 
 /*
